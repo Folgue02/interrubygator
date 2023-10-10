@@ -28,7 +28,6 @@ class QuestionBuilder
       raise ArgumentError, "No right answer for question #{@prompt}"
     end
     question = Question.new(@prompt, @answers, @right)
-    puts question
     return question
   end
 end
@@ -45,10 +44,12 @@ class Question
   end
 
   def display(index=nil)
+    puts "-" * 30
     if !index.nil?
       print "#{index}. "
     end
     puts " :: #{@question_prompt}"
+    puts "-" * 30
 
     count = 1
     @answers.each do |answer|
@@ -58,6 +59,9 @@ class Question
 
   end
 
+  def right_answer
+    @answers[@right]
+  end
 
   def prompt(index = nil)
     self.display index
@@ -126,6 +130,8 @@ class QuestionBundle
       count += 1
       if question.prompt count
         score += 1
+      else
+        puts "Incorrect! The right answer was: #{question.right_answer}"
       end
     end
 
@@ -143,7 +149,7 @@ class QuestionBundle
     return sb.string
   end
 
-  def number_of_questions
+  def length
     @questions.length
   end
 end
@@ -157,8 +163,12 @@ def main
     puts "No file specified :("
   else
     bdl = QuestionBundle.new ARGV[0]
-    puts bdl
-    puts "Right questions: #{bdl.prompt_all}/#{bdl.number_of_questions}"
+    puts "Loaded file '#{ARGV[0]}' with #{bdl.length} question(s)"
+
+    start = Integer(Time.now.strftime '%s%L')
+    puts "Right answers: #{bdl.prompt_all}/#{bdl.length}"
+    endTime = Integer(Time.now.strftime '%s%L')
+    puts "You've finished the test in #{(endTime - start) / 1000} seconds, with an average of #{(endTime - start) / 1000 / bdl.length} per question."
   end
 end
 
