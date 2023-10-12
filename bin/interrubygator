@@ -1,0 +1,50 @@
+#!/bin/env ruby
+require_relative File.expand_path('../lib/questions.rb', __dir__)
+require 'optparse'
+
+VERSION = "0.0.1"
+
+def main
+  options = {}
+
+  option_parser = OptionParser.new do |opts|
+    opts.on '-f', '--file=FILE', String, 'Questions file'
+    opts.on '-s', '--shuffle', TrueClass, 'Shuffle the questions'
+    opts.on '-v', '--version', TrueClass, 'Display interrubygator\'s current version and quit'
+  end
+
+  option_parser.parse!(into: options)
+
+  if options[:version]
+    puts "Interrubygator's current version: #{VERSION}"
+      exit 0
+  end
+
+  if options[:file].nil?
+    puts "You didn't specify the file!"
+    exit 1
+  end
+
+
+  if !File.exist? options[:file]
+    puts "The file '#{options[:file]}' doesn't exist!"
+    exit 1
+  end
+
+  qbdl = QuestionBundle.new options[:file]
+
+  puts "Loaded file '#{options[:file]}' with #{qbdl.length} question(s)"
+
+  if options[:shuffle]
+    puts 'Shuffle mode set to true'
+    qbdl.shuffle!
+  end
+
+  startTime = Integer(Time.now.strftime '%s%L') 
+  rightAnswers = qbdl.prompt_all
+  puts "RIGHT ANSWERS: #{rightAnswers}/#{qbdl.length}"
+  endTime = Integer(Time.now.strftime '%s%L') 
+  puts "You've finished the test in #{(endTime - startTime) / 1000} seconds, with an average of #{(endTime - startTime) / 1000 / qbdl.length} per question."
+end
+
+main()
