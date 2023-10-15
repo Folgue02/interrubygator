@@ -1,8 +1,7 @@
 #!/bin/env ruby
 require_relative File.expand_path('../lib/questions.rb', __dir__)
 require 'optparse'
-
-VERSION = "0.0.1"
+require_relative 'version'
 
 def main
   options = {}
@@ -13,11 +12,16 @@ def main
     opts.on '-v', '--version', TrueClass, 'Display interrubygator\'s current version and quit'
   end
 
-  option_parser.parse!(into: options)
+  begin
+    option_parser.parse!(into: options)
+  rescue StandardError => e
+    puts "Wrong arguments: #{e}"
+    exit 1
+  end
 
   if options[:version]
     puts "Interrubygator's current version: #{VERSION}"
-      exit 0
+    exit 0
   end
 
   if options[:file].nil?
